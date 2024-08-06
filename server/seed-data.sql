@@ -21,3 +21,4 @@ VALUES
     ('Lincoln', 'Sequoia National Park', 255.8, 98.3),
     ('Stagg', 'Private Land', 243.0, 109.0);
 
+

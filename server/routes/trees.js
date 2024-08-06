@@ -20,7 +20,7 @@ const db = new sqlite3.Database(process.env.DATA_SOURCE, sqlite3.OPEN_READWRITE)
  *   - Ordered by the height_ft from tallest to shortest
  */
 // Your code here
-router.get('/', (req, res) => {
+router.get('/', (req, res, next) => {
     const sql = `SELECT id, tree FROM trees ORDER BY tree DESC`;
     const params = [];
     db.all(sql, params, (err, rows) => {
@@ -41,7 +41,7 @@ router.get('/', (req, res) => {
  *   - Properties: id, tree, location, height_ft, ground_circumference_ft
  */
 // Your code here
-router.get('/:id', (req, res) => {
+router.get('/:id', (req, res, next) => {
     const sql = `SELECT * FROM trees WHERE id = ?`;
     const params = [req.params.id];
     db.get(sql, params, (err, row) => {
@@ -63,7 +63,7 @@ router.get('/:id', (req, res) => {
  *   - Value: success
  */
 // Your code here
-router.post('/', (req, res) => {
+router.post('/', (req, res, next) => {
     const sql = `INSERT INTO trees (tree, location, height_ft, ground_circumference_ft) VALUES (?, ?, ?, ?)`;
     const params = [req.body.name, req.body.location, req.body.height, req.body.size];
     db.run(sql, params, (err) => {
@@ -85,7 +85,17 @@ router.post('/', (req, res) => {
  *   - Value: success
  */
 // Your code here
-
+router.delete('/:id', (req, res, next) => {
+    const sql = `DELETE from trees WHERE id = ?`;
+    const params = [Number(req.params.id)];
+    db.run(sql, params, (err) => {
+        if (err) {
+            next(err);
+        } else {
+            res.json({ message: "success" });
+        }
+    });
+});
 /**
  * INTERMEDIATE PHASE 6 - UPDATE a tree row in the database
  *
@@ -97,6 +107,20 @@ router.post('/', (req, res) => {
  *   - Value: success
  */
 // Your code here
-
+router.put('/:id', (req, res, next) => {
+    if (Number(req.body.id) !== Number(req.body.id)) {
+        res.status(400).json({ error: "ids do not match" });
+    } else {
+        const sql = `UPDATE trees SET tree = ?, location = ?, height_ft = ?, ground_circumference_ft = ? WHERE id = ?`;
+        const params = [req.body.name, req.body.location, req.body.height, req.body.size, Number(req.body.id)];
+        db.run(sql, params, (err) => {
+            if (err) {
+                next(err);
+            } else {
+                res.json({ message: "success" });
+            }
+        })
+    }
+});
 // Export class - DO NOT MODIFY
 module.exports = router;
